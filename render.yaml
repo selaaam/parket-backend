@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: parket-api
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --workers 2 --timeout 60
+    envVars:
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: parket-db
+          property: connectionString
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: WARDEN_DEFAULT_PIN
+        sync: false
+
+databases:
+  - name: parket-db
+    databaseName: parket
+    user: parket
+    plan: free

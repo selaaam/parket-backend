@@ -164,7 +164,7 @@ class _PgConn:
 
         if needs_returning:
             conflict = " ON CONFLICT DO NOTHING" if ignore else ""
-            adapted = adapted.rstrip("; ") + conflict + " RETURNING id"
+            adapted = adapted.rstrip("; ") + conflict + " RETURNING *"
         elif ignore:
             adapted = adapted.rstrip("; ") + " ON CONFLICT DO NOTHING"
 
@@ -174,7 +174,7 @@ class _PgConn:
         lid = None
         if needs_returning:
             row = cur.fetchone()
-            lid = row["id"] if row else None
+            lid = row.get("id") if row else None
 
         return _PgCursor(cur, lid)
 

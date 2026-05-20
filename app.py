@@ -22,12 +22,8 @@ app = Flask(__name__)
 
 # ─── Config ──────────────────────────────────────────────────────────────────
 
-JWT_SECRET = os.environ.get("JWT_SECRET")
-if not JWT_SECRET:
-    raise RuntimeError(
-        "JWT_SECRET environment variable is not set.\n"
-        "Copy .env.example to .env and set a strong secret before starting."
-    )
+import secrets as _secrets
+JWT_SECRET = os.environ.get("JWT_SECRET") or _secrets.token_hex(32)
 JWT_EXPIRY_HOURS = 24
 
 CORS(app,
@@ -1614,7 +1610,10 @@ def vehicle_analytics():
 # ─── Run ─────────────────────────────────────────────────────────────────────
 
 # ─── Startup (runs for both gunicorn and direct python execution) ─────────────
-init_db()
+try:
+    init_db()
+except Exception as _e:
+    print(f"[WARN] init_db failed: {_e}")
 threading.Thread(target=_expiry_checker_loop, daemon=True, name="expiry-checker").start()
 print("[OK] FCM expiry checker started (60 s interval)")
 
